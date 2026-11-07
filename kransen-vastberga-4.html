@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kransen &amp; Västberga 2026–2027 | 1%-klubben</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0d1426;color:#f8fafc;font-family:system-ui,Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:20px}main{width:min(100%,720px);background:#1b283d;border:1px solid #34445d;border-radius:24px;padding:clamp(22px,5vw,40px);box-shadow:0 20px 50px #0005}.top,.meta{display:flex;justify-content:space-between;align-items:center;gap:10px}.pill{background:#31425e;padding:9px 14px;border-radius:999px;font-size:14px}h1{font-size:clamp(28px,6vw,42px);margin:14px 0}p{color:#cbd5e1;line-height:1.6}.track{height:10px;background:#34445d;border-radius:99px;margin:28px 0;overflow:hidden}.fill{height:100%;background:#4ade80;width:0;transition:width .2s}.meta{color:#cbd5e1;margin:14px 0 24px}h2{font-size:clamp(22px,4vw,29px);line-height:1.3}button{font:inherit;cursor:pointer}.choice{display:block;width:100%;padding:17px 20px;margin:12px 0;border:1px solid #415574;background:#293b55;color:white;text-align:left;border-radius:15px;line-height:1.45}.choice:disabled{cursor:default;opacity:.75}.choice.correct{background:#14532d;border-color:#4ade80;opacity:1}.choice.wrong{background:#7f1d1d;border-color:#fca5a5;opacity:1}.feedback{background:#111d30;border-left:4px solid #4ade80;padding:15px;border-radius:8px;margin-top:18px;line-height:1.6}.next{background:#2563eb;color:white;border:0;border-radius:12px;padding:14px 22px;margin-top:18px;font-weight:700;width:100%}footer{text-align:center;color:#94a3b8;font-size:13px;margin-top:24px}.hide{display:none!important}.result{text-align:center;font-size:56px;font-weight:800;margin:16px 0}.small{font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><span class="pill">🏆 1%-klubben</span><span id="counter" class="pill">Fråga 1 av 15</span></div>
+<h1>🚇 Kransen &amp; Västberga</h1>
+<p>2026–2027 · 15 frågor om Midsommarkransen, Västberga och närområdet. Ett svar per fråga.</p>
+<div class="track"><div id="fill" class="fill"></div></div>
+<div class="meta"><span id="category">Lokalhistoria</span><strong id="score">Poäng: 0</strong></div>
+<section id="game"><h2 id="question">Laddar fråga…</h2><div id="choices"></div><div id="feedback" class="feedback hide" aria-live="polite"></div><button id="next" class="next hide" type="button">Nästa fråga →</button></section>
+<section id="end" class="hide"><h2>🏁 Slutresultat</h2><div id="result" class="result"></div><p id="rating"></p><button id="restart" class="next" type="button">Spela igen</button><button id="share" class="next" type="button">Dela mitt resultat</button></section>
+<footer>Kransen &amp; Västberga · Fristående quiz i 1%-klubben<br><span class="small">Frågorna gäller etablerade lokala fakta, inte framtida beslut för 2027.</span></footer>
+</main>
+<script>
+'use strict';
+const questions = [
+{category:'Tunnelbana',question:'Vilken tunnelbanelinje trafikerar Midsommarkransen?',options:['Röda linjen','Gröna linjen','Blå linjen','Tvärbanan'],correct:0,explanation:'Midsommarkransen ligger på röda linjen, linje 14 mot Fruängen.'},
+{category:'Historia',question:'Vilken typ av stadsutveckling präglade Midsommarkransen under tidigt 1900-tal?',options:['Utbyggnad av arbetarbostäder','En kunglig slottsanläggning','En ny oceangående hamn','En stor flygplats'],correct:0,explanation:'Midsommarkransen växte fram med arbetarbostäder och småskalig bebyggelse.'},
+{category:'Geografi',question:'Vilken stadsdel ligger öster om Midsommarkransen, i området mot industriområdet?',options:['Västberga','Bromma','Östermalm','Hjorthagen'],correct:0,explanation:'Västberga ligger öster och sydost om Midsommarkransen.'},
+{category:'Arkitektur',question:'Vilken bostadstyp förknippas med Midsommarkransens äldre bebyggelse?',options:['Skyskrapor i glas','Småskaliga flerfamiljshus och arbetarbostäder','Miljonprogramshus från 1970-talet','Medeltida stenhus'],correct:1,explanation:'Kransens äldre kvarter har småskalig bebyggelse från tidigt 1900-tal.'},
+{category:'Tunnelbana',question:'Vilken station kommer efter Midsommarkransen i riktning mot Fruängen?',options:['Aspudden','Telefonplan','Liljeholmen','Örnsberg'],correct:1,explanation:'På röda linjen mot Fruängen kommer Telefonplan efter Midsommarkransen.'},
+{category:'Industrihistoria',question:'Vilket företag har en särskilt stark historisk koppling till Telefonplan?',options:['Ericsson','Volvo','SKF','ASEA'],correct:0,explanation:'Ericsson hade en stor telefonfabrik vid Telefonplan.'},
+{category:'Stadsmiljö',question:'Vid vilken gata ligger den klassiska biografen Tellus?',options:['Tellusborgsvägen','Drottninggatan','Sveavägen','Valhallavägen'],correct:0,explanation:'Biografen Tellus ligger vid Tellusborgsvägen.'},
+{category:'Stadsplanering',question:'Vad har Västberga historiskt varit särskilt känt för?',options:['Industri- och verksamhetsområden','Medeltida stadskärna','Skärgårdsö utan bro','Fjällturism'],correct:0,explanation:'Västberga har länge haft industri, lager och andra verksamheter.'},
+{category:'Stadsdelar',question:'Vilket av dessa områden förknippas mest med stora lager- och industrilokaler?',options:['Västberga industriområde','Gamla stan','Skeppsholmen','Djurgården'],correct:0,explanation:'Västberga industriområde är ett välkänt verksamhetsområde i södra Stockholm.'},
+{category:'Tunnelbana',question:'Vilken station ligger mellan Midsommarkransen och Liljeholmen?',options:['Aspudden','Skanstull','Hornstull','Globen'],correct:0,explanation:'Ordningen mot city är Midsommarkransen, Aspudden, Liljeholmen.'},
+{category:'Lokal kultur',question:'Vilken kulturinstitution är särskilt förknippad med Midsommarkransen?',options:['Biografen Tellus','Kungliga Operan','Dramaten','Skansen'],correct:0,explanation:'Biografen Tellus är en lokal kulturmötesplats.'},
+{category:'Industrihistoria',question:'Vad tillverkades historiskt i Ericssons anläggning vid Telefonplan?',options:['Telefonutrustning','Lokomotiv','Pappersmassa','Flygplansmotorer'],correct:0,explanation:'Anläggningen användes för telefoner och telekommunikationsutrustning.'},
+{category:'Geografi',question:'Vilket område ligger närmast Midsommarkransen?',options:['Aspudden','Kista','Tensta','Farsta strand'],correct:0,explanation:'Aspudden gränsar till Midsommarkransen.'},
+{category:'Samhälle',question:'Vilken kommun tillhör Midsommarkransen och Västberga?',options:['Huddinge','Stockholm','Solna','Nacka'],correct:1,explanation:'Båda stadsdelarna ligger i Stockholms kommun.'},
+{category:'Geografi',question:'Vilket påstående om båda stadsdelarna stämmer?',options:['Båda ligger i Stockholms län','Båda ligger på Södermalm','Båda har blå tunnelbanelinje','Båda ligger norr om innerstaden'],correct:0,explanation:'Båda ligger i Stockholms län, söder om innerstaden.'}
+];
+let index=0,points=0,locked=false;
+function get(id){return document.getElementById(id)}
+function render(){
+  locked=false;
+  const q=questions[index];
+  get('counter').textContent='Fråga '+(index+1)+' av '+questions.length;
+  get('category').textContent=q.category;
+  get('score').textContent='Poäng: '+points;
+  get('fill').style.width=(index/questions.length*100)+'%';
+  get('question').textContent=q.question;
+  get('choices').replaceChildren();
+  get('feedback').classList.add('hide');
+  get('next').classList.add('hide');
+  q.options.forEach(function(option,j){
+    const button=document.createElement('button');
+    button.type='button';button.className='choice';
+    button.textContent='ABCD'[j]+'. '+option;
+    button.addEventListener('click',function(){answer(j)});
+    get('choices').appendChild(button);
+  });
+}
+function answer(j){
+  if(locked)return;
+  locked=true;
+  const q=questions[index];
+  if(j===q.correct)points++;
+  Array.from(get('choices').children).forEach(function(button,k){
+    button.disabled=true;
+    if(k===q.correct)button.classList.add('correct');
+    else if(k===j)button.classList.add('wrong');
+  });
+  get('score').textContent='Poäng: '+points;
+  get('feedback').textContent=(j===q.correct?'✅ Rätt! ':'❌ Inte riktigt. Rätt svar: '+'ABCD'[q.correct]+'. '+q.options[q.correct]+'. ')+q.explanation;
+  get('feedback').classList.remove('hide');
+  get('next').textContent=index===questions.length-1?'Visa slutresultat →':'Nästa fråga →';
+  get('next').classList.remove('hide');
+}
+function finish(){
+  get('game').classList.add('hide');get('end').classList.remove('hide');
+  get('counter').textContent='Klart!';get('fill').style.width='100%';
+  get('result').textContent=points+' / '+questions.length;
+  get('rating').textContent=points>=13?'🏆 Lokalhistorisk mästare!':points>=10?'🌟 Riktigt bra koll på området!':points>=7?'👏 Bra jobbat – du kan dina kvarter!':'📚 Nu har du lärt dig mer om Kransen och Västberga!';
+}
+get('next').addEventListener('click',function(){index++;if(index<questions.length)render();else finish()});
+get('restart').addEventListener('click',function(){index=0;points=0;get('end').classList.add('hide');get('game').classList.remove('hide');render()});
+get('share').addEventListener('click',async function(){
+  const message='Jag fick '+points+' av 15 rätt i Kransen & Västberga i 1%-klubben! '+location.href;
+  if(navigator.share){try{await navigator.share({title:'Kransen & Västberga',text:message})}catch(error){}}
+  else if(navigator.clipboard){try{await navigator.clipboard.writeText(message);alert('Resultatet kopierat!')}catch(error){prompt('Kopiera resultatet:',message)}}
+  else prompt('Kopiera resultatet:',message);
+});
+render();
+</script>
+</body>
+</html>
